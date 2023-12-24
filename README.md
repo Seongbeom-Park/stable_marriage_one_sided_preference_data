@@ -25,4 +25,13 @@
 - `student{n}_school{m}_utility.png`: figure of qualitative utility with n students and m schools
 - `student{n}_school{m}_execution_time.png`: figure of execution time with n students and m schools
 
+## Generate Input Data
+```
+python3 scripts/generate.py 100 5 input 0 1 2 3 4 5 6 7 8 9 0
+```
+
+## Plot Output Data
+```
+python3 scripts/plot.py 100 5 output figure
+```
 
