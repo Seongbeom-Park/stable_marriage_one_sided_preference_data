@@ -77,6 +77,7 @@ if __name__ == '__main__':
     parser.add_argument('input_path', help='loading allocation result from the path')
     parser.add_argument('output_path', help='saving figures to the path')
     parser.add_argument('--console', action=argparse.BooleanOptionalAction, help='print data to the stdout without saving figures')
+    parser.add_argument('--max_bar_count', type=int, default=5, help='maximum bar count in the figure')
     args = parser.parse_args()
 
     output_filepath = os.path.join(args.output_path,
@@ -88,8 +89,8 @@ if __name__ == '__main__':
             'student' + str(args.student_count) + '_school' + str(args.school_count),
             'student' + str(args.student_count) + '_school' + str(args.school_count) + '_summary.csv')
     summary = read(summary_filepath)
-    utility_optimal, execution_time_optimal = calculate_mean([row for row in summary if row['algorithm'] == 'student_optimal'])
     utility_tb, execution_time_tb = calculate_mean([row for row in summary if row['algorithm'] == 'tie_breaking'])
+    utility_optimal, execution_time_optimal = calculate_mean([row for row in summary if row['algorithm'] == 'student_optimal'])
     time_multiplier, time_unit = (1000, 'ms') if execution_time_optimal < 1.0 else (1, 's')
     print(utility_optimal, execution_time_optimal * time_multiplier, time_unit)
     print(utility_tb, execution_time_tb * time_multiplier, time_unit)
@@ -98,8 +99,9 @@ if __name__ == '__main__':
         figure_utility_filepath = os.path.join(output_filepath,
                 'student' + str(args.student_count) + '_school' + str(args.school_count) + '_utility.png')
         z = len(utility_tb)
-        plot(['Rank ' + str(pref + 1) for pref in range(z)],
-                [
+        if z <= args.max_bar_count:
+            x = ['Rank ' + str(pref + 1) for pref in range(z)]
+            y = [
                     (
                         LABEL_TIE_BREAKING,
                         [utility_tb['pref_' + str(pref)] for pref in range(z)],
@@ -108,7 +110,23 @@ if __name__ == '__main__':
                         LABEL_STUDENT_OPTIMAL,
                         [utility_optimal['pref_' + str(pref)] for pref in range(z)],
                         ),
-                    ],
+                    ]
+        else:
+            x = ['Rank ' + str(pref + 1) for pref in range(args.max_bar_count - 1)] + ['Rank ' + str(args.max_bar_count) + '-' + str(z)]
+            util_tb = [utility_tb['pref_' + str(pref)] for pref in range(z)]
+            util_optimal = [utility_optimal['pref_' + str(pref)] for pref in range(z)]
+            y = [
+                    (
+                        LABEL_TIE_BREAKING,
+                        util_tb[:args.max_bar_count - 1] + [sum(util_tb[args.max_bar_count - 1:])],
+                        ),
+                    (
+                        LABEL_STUDENT_OPTIMAL,
+                        util_optimal[:args.max_bar_count - 1] + [sum(util_optimal[args.max_bar_count - 1:])],
+                        ),
+                    ]
+
+        plot(x, y,
                 figure_utility_filepath,
                 xlabel='Preference Rank of Allocated School',
                 ylabel='Number of Students',

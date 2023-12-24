@@ -22,8 +22,8 @@
 
 ## Figures
 - `figures/student{n}_school{m}`: n students and m schools
-- `student{n}_school{m}_utility.png`: figure of qualitative utility with n students and m schools
-- `student{n}_school{m}_execution_time.png`: figure of execution time with n students and m schools
+- `student{n}_school{m}_utility.png`: figure of qualitative utility
+- `student{n}_school{m}_execution_time.png`: figure of execution time
 
 ## Generate Input Data
 ```
